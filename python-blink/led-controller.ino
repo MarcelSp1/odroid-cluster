@@ -29,11 +29,14 @@ void loop() {
   if (SerialUSB.available() >= 4) {
   
     
-    uint8_t buffer[4]{};
+    uint8_t buffer[5]{};
 
     for(int i = 0; i < 4; i++) {
       buffer[i] = SerialUSB.read();
       SerialUSB.write(buffer[i]);
+      if(buffer[i] = 255) {
+        continue;
+      }
     }
     
     uint8_t position = buffer[0];

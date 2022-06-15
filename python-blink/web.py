@@ -1,4 +1,5 @@
 #!flask/bin/python
+from optparse import Values
 import serial
 import binascii
 from flask import request, abort, Flask
@@ -12,7 +13,7 @@ print(ser.name)  # check which port was really used
 @app.route('/blink', methods=['GET', 'POST'])
 def blink():
     value = request.args.get('value') + '\n'
-    values = value.split(".")
+    values = value.split(".") 
 
     if len(values) != 4:
         abort(400)  # Bad request
@@ -21,18 +22,26 @@ def blink():
         # Parse as int
         values = list(map(lambda x: int(x, 10), values))
     except ValueError:
-	print("bad ints")
+        print("bad ints")
         abort(400)  # Bad request
         return
 
     if values[0] < 0 or values[0] > 5:
-	print("invalid led")
+        print("invalid led")
         abort(400)  # Bad request
         return
 
     if not all([0 <= x <= 255 for x in values[1:]]):
         abort(400)
         return
+    for i in range(1, 4):
+        if values[i] == 255:
+            values[i] = 254
+
+        
+
+    values.append(255)
+
 
     # print(len(bytearray(values)))
     # ser.write(bytearray(values))
@@ -41,6 +50,7 @@ def blink():
     print(binascii.hexlify(bytearray(values)))
     # ser.flush()
     return 'ok', 200
+    
 
 
 app.run(host='0.0.0.0', port=5000)
